@@ -23,6 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Virtualbox vm name management
       vm_config.vm.provider "virtualbox" do |vm|
           vm.name = name.to_s
+          vm.memory = 2048
       end
 
 
@@ -48,7 +49,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vm_config.vm.provision 'ansible' do |ansible|
         ansible.playbook = 'tests/test_vagrant.yml'
         # Enable requirement if role has dependencies
-        # ansible.galaxy_role_file = './requirements.yml'
+        ansible.galaxy_role_file = './requirements.yml'
         ansible.extra_vars = {
           ansible_python_interpreter: '/usr/bin/env python2.7'
         }
