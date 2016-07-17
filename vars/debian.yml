@@ -1,0 +1,8 @@
+---
+
+# Debian specific vars
+
+logstash_packages:
+  - 'logstash'
+
+logstash_service_name: 'logstash'
