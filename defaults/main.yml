@@ -2,3 +2,11 @@
 
 # Defaults vars file for logstash role
 
+# Package and repository variables
+logstash_apt_cache_valid_time: 3600
+logstash_package_state: 'latest'
+logstash_version: '2.3'
+
+# Service management
+logstash_service_enabled: True
+logstash_service_state: 'started'

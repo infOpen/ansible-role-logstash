@@ -4,6 +4,8 @@
 
 - hosts: all
   roles:
-    - role: "."
+    - role: "{{ role_name }}"
   vars:
-    role_name: "{{ playbook_dir | dirname | basename }}"
+    role_name: "{{ playbook_dir | basename }}"
+  vars_files:
+    - './tests/test_vars.yml'

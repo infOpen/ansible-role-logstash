@@ -1,0 +1,52 @@
+---
+
+- name: 'Install logstash key'
+  become: True
+  apt_key:
+    url: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
+    state: 'present'
+
+
+- name: 'Add logstash repository'
+  become: True
+  template:
+    dest: '/etc/apt/sources.list.d/logstash.list'
+    src: "{{ role_path }}/templates/etc/apt/sources.list.d/logstash.list.j2"
+    group: 'root'
+    owner: 'root'
+    mode: '0644'
+  register: 'logstash_repository_updated'
+
+
+- name: 'Update packages list if repository updated'
+  become: True
+  apt:
+    update_cache: True
+  when: "{{ logstash_repository_updated | changed }}"
+
+
+- name: 'Update packages list if cache is too old'
+  become: True
+  apt:
+    update_cache: True
+    cache_valid_time: "{{ logstash_apt_cache_valid_time }}"
+
+
+- name: 'Install logstash'
+  become: True
+  package:
+    name: "{{ item }}"
+    state: "{{ logstash_package_state }}"
+  with_items: "{{ logstash_packages }}"
+  notify:
+    - 'restart logstash'
+
+
+- name: 'Manage logstash service'
+  become: True
+  service:
+    name: "{{ logstash_service_name }}"
+    enabled: "{{ logstash_service_enabled }}"
+    state: "{{ logstash_service_state }}"
+  notify:
+    - 'restart logstash'

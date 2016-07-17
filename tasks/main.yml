@@ -1,4 +1,16 @@
 ---
 
-# Main tasks file for logstash role
+# Tasks file for logstash
 
+- name: 'Load the OS specific varibles'
+  include_vars: "{{ role_path }}/vars/{{ ansible_os_family | lower }}.yml"
+  tags:
+    - 'install'
+    - 'logstash'
+
+
+- include: 'install_debian.yml'
+  when: "{{ ansible_os_family == 'Debian' }}"
+  tags:
+    - 'install'
+    - 'logstash'
