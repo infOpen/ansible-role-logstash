@@ -13,6 +13,4 @@ galaxy_info:
         - 'xenial'
   galaxy_tags:
     - 'system'
-dependencies:
-  - role: 'infOpen.openjdk-jre'
-    openjdk_jre_version: 8
+dependencies: []
