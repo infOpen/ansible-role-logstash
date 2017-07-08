@@ -4,9 +4,16 @@
 
 # Package and repository variables
 logstash_apt_cache_valid_time: 3600
-logstash_package_state: 'latest'
-logstash_version: '2.3'
+logstash_packages: "{{ _logstash_packages }}"
+logstash_repositories: "{{ _logstash_repositories }}"
+logstash_system_dependencies: "{{ _logstash_system_dependencies }}"
+logstash_version: '5.x'
+
+# GPG
+logstash_gpg_keys:
+  - url: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
 
 # Service management
+logstash_service_name: "{{ _logstash_service_name }}"
 logstash_service_enabled: True
 logstash_service_state: 'started'

@@ -1,52 +1,53 @@
 """
 Role tests
 """
+
+from testinfra.utils.ansible_runner import AnsibleRunner
 import pytest
 
-
-# pytestmark = pytest.mark.docker_images(
-pytestmark = pytest.mark.docker_images('infopen/ubuntu-xenial-ssh-py27:0.2.0')
+testinfra_hosts = AnsibleRunner('.molecule/ansible_inventory').get_hosts('all')
 
 
-def test_packages(Package):
+@pytest.mark.parametrize('name', [
+    ('python-apt-common'),
+    ('python-apt'),
+    ('logstash'),
+    ('openjdk-9-jre'),
+])
+def test_packages(host, name):
     """
     Tests about packages installed on all systems
     """
 
-    packages = [
-        'python-apt-common', 'python-apt', 'logstash', 'openjdk-8-jre'
-    ]
-
-    for package in packages:
-        assert Package(package).is_installed is True
+    assert host.package(name).is_installed
 
 
-def test_group(Group):
+def test_group(host):
     """
     Test about logstash group
     """
 
-    assert Group('logstash').exists
+    assert host.group('logstash').exists
 
 
-def test_user(User):
+def test_user(host):
     """
     Test about logstash user
     """
 
-    user = User('logstash')
+    user = host.user('logstash')
 
     assert user.exists
     assert user.group == 'logstash'
     assert user.shell == '/usr/sbin/nologin'
-    assert user.home == '/var/lib/logstash'
+    assert user.home == '/usr/share/logstash'
 
 
-def test_service(Command, Service):
+def test_service(host):
     """
     Test about logstash service
     """
 
-    assert Service('logstash').is_enabled
-    assert Service('logstash').is_running
-    assert Command('systemctl status logstash').rc == 0
+    assert host.service('logstash').is_enabled
+    assert host.service('logstash').is_running
+    assert host.run('systemctl status logstash').rc == 0

@@ -7,16 +7,12 @@
   tags:
     - 'role::logstash'
     - 'role::logstash::init'
+    - 'role::logstash::install'
 
-- name: 'Load the OS specific varibles'
-  include_vars: "{{ role_path }}/vars/{{ ansible_os_family | lower }}.yml"
+
+- name: 'INSTALL | Manage OS family installation tasks'
+  become: True
+  include: "{{ role_path }}/tasks/install_{{ ansible_os_family | lower }}.yml"
   tags:
-    - 'install'
-    - 'logstash'
-
-
-- include: 'install_debian.yml'
-  when: "{{ ansible_os_family == 'Debian' }}"
-  tags:
-    - 'install'
-    - 'logstash'
+    - 'role::logstash'
+    - 'role::logstash::install'

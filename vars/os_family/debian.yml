@@ -1,0 +1,15 @@
+---
+
+# Debian OS family specific vars
+
+_logstash_packages:
+  - name: 'logstash'
+
+_logstash_repositories:
+  - repo: "deb https://artifacts.elastic.co/packages/{{ logstash_version }}/apt stable main"
+
+_logstash_service_name: 'logstash'
+
+_logstash_system_dependencies:
+  - name: 'ca-certificates'
+  - name: 'apt-transport-https'

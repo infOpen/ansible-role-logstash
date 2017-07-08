@@ -2,9 +2,12 @@
 
 # Handlers main file for logstash role
 
-- name: 'restart logstash'
+- name: 'HANDLER | Restart logstash'
   become: True
   service:
     name: "{{ logstash_service_name }}"
     state: 'restarted'
-  when: "{{ logstash_service_state != 'stopped' }}"
+  when: "logstash_service_state != 'stopped'"
+  tags:
+    - 'role::logstash'
+    - 'role::logstash::install'

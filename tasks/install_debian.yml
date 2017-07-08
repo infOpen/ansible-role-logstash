@@ -1,52 +1,45 @@
 ---
 
-- name: 'Install logstash key'
-  become: True
-  apt_key:
-    url: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
-    state: 'present'
-
-
-- name: 'Add logstash repository'
-  become: True
-  template:
-    dest: '/etc/apt/sources.list.d/logstash.list'
-    src: "{{ role_path }}/templates/etc/apt/sources.list.d/logstash.list.j2"
-    group: 'root'
-    owner: 'root'
-    mode: '0644'
-  register: 'logstash_repository_updated'
-
-
-- name: 'Update packages list if repository updated'
-  become: True
+- name: 'INSTALL | APT | Install system dependencies'
   apt:
-    update_cache: True
-  when: "{{ logstash_repository_updated | changed }}"
-
-
-- name: 'Update packages list if cache is too old'
-  become: True
-  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
     update_cache: True
     cache_valid_time: "{{ logstash_apt_cache_valid_time }}"
+  with_items: "{{ logstash_system_dependencies }}"
 
 
-- name: 'Install logstash'
-  become: True
-  package:
-    name: "{{ item }}"
-    state: "{{ logstash_package_state }}"
+- name: 'INSTALL | APT | Install Logstash key'
+  apt_key:
+    url: "{{ item.url }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ logstash_gpg_keys }}"
+
+
+- name: 'INSTALL | APT | Add Logstash repository'
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: "{{ item.state | default('present') }}"
+    filename: "{{ item.filename | default(omit) }}"
+    mode: "{{ item.mode | default(omit) }}"
+  with_items: "{{ logstash_repositories }}"
+
+
+- name: 'INSTALL | APT | Install Logstash packages'
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    update_cache: True
+    cache_valid_time: "{{ logstash_apt_cache_valid_time }}"
   with_items: "{{ logstash_packages }}"
   notify:
-    - 'restart logstash'
+    - 'HANDLER | Restart logstash'
 
 
-- name: 'Manage logstash service'
-  become: True
+- name: 'INSTALL | SERVICE | Manage Logstash service'
   service:
     name: "{{ logstash_service_name }}"
     enabled: "{{ logstash_service_enabled }}"
     state: "{{ logstash_service_state }}"
   notify:
-    - 'restart logstash'
+    - 'HANDLER | Restart logstash'
